@@ -12,3 +12,13 @@ body {
     background: #f0f2f5;
     color: #000;
 }
+
+input {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+
+}
