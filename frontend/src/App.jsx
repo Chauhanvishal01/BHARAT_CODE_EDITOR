@@ -10,6 +10,7 @@ const App = () => {
   const [code, setCode] = useState("");
   const [copySuccess, setCopySuccess] = useState("");
   const [users, setUsers] = useState([]);
+  const [typing, setTyping] = useState("");
 
   const joinRoom = () => {
     if (roomId && userName) {
@@ -28,6 +29,7 @@ const App = () => {
   const handleCodeChange = (newCode) => {
     setCode(newCode);
     socket.emit("codeChange", { roomId, code: newCode });
+    socket.emit("typing", { roomId, userName });
   };
 
   useEffect(() => {
@@ -38,10 +40,17 @@ const App = () => {
     socket.on("codeUpdate", (newCode) => {
       setCode(newCode);
     });
+    socket.on("userTyping", (user) => {
+      setTyping(`${user} is Typing... `);
+      setTimeout(() => {
+        setTyping("");
+      }, 4000);
+    });
 
     return () => {
       socket.off("userJoined");
       socket.off("codeUpdate");
+      socket.off("userTyping");
     };
   }, []);
   useEffect(() => {
@@ -129,7 +138,7 @@ const App = () => {
         </div>
 
         {/* Typing Indicator */}
-        <p className="text-sm text-gray-600 italic">User typing...</p>
+        <p className="text-sm text-gray-600 italic">{typing}</p>
 
         {/* Language Selector */}
         <div>
