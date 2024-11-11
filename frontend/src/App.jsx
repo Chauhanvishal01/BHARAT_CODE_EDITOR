@@ -7,7 +7,7 @@ const App = () => {
   const [roomId, setRoomId] = useState("");
   const [userName, setUserName] = useState("");
   const [language, setLanguage] = useState("javascript");
-  const [code, setCode] = useState("");
+  const [code, setCode] = useState("// start code here");
   const [copySuccess, setCopySuccess] = useState("");
   const [users, setUsers] = useState([]);
   const [typing, setTyping] = useState("");
@@ -36,6 +36,15 @@ const App = () => {
     const newLanguage = e.target.value;
     setLanguage(newLanguage);
     socket.emit("languageChange", { roomId, language: newLanguage });
+  };
+
+  const leaveRoom = () => {
+    socket.emit("leaveRoom");
+    setJoined(false);
+    setRoomId("");
+    setUserName("");
+    setCode("// start code here");
+    setLanguage("javascript");
   };
 
   useEffect(() => {
@@ -165,7 +174,10 @@ const App = () => {
         </div>
 
         {/* Leave Room Button */}
-        <button className="w-full py-3 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors duration-300 ease-in-out">
+        <button
+          className="w-full py-3 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors duration-300 ease-in-out"
+          onClick={leaveRoom}
+        >
           Leave Room
         </button>
       </div>
