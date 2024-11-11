@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import io from "socket.io-client";
 import Editor from "@monaco-editor/react";
 const socket = io("http://localhost:4000");
@@ -9,9 +9,11 @@ const App = () => {
   const [language, setLanguage] = useState("javascript");
   const [code, setCode] = useState("");
   const [copySuccess, setCopySuccess] = useState("");
+  const [users, setUsers] = useState([]);
+
   const joinRoom = () => {
     if (roomId && userName) {
-      socket.emit("join", roomId, userName);
+      socket.emit("join", { roomId, userName });
       setJoined(true);
     }
   };
@@ -25,7 +27,33 @@ const App = () => {
   };
   const handleCodeChange = (newCode) => {
     setCode(newCode);
+    socket.emit("codeChange", { roomId, code: newCode });
   };
+
+  useEffect(() => {
+    socket.on("userJoined", (users) => {
+      setUsers(users);
+    });
+
+    socket.on("codeUpdate", (newCode) => {
+      setCode(newCode);
+    });
+
+    return () => {
+      socket.off("userJoined");
+      socket.off("codeUpdate");
+    };
+  }, []);
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      socket.emit("leaveRoom");
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
 
   if (!joined) {
     return (
@@ -89,8 +117,14 @@ const App = () => {
             Users in Room:
           </h3>
           <ul className="space-y-2">
-            <li className="text-gray-700">Vishal</li>
-            <li className="text-gray-700">Chauhan</li>
+            {users.map((user, index) => (
+              <li
+                key={index}
+                className="text-white p-2 bg-gray-600 rounded-md shadow-sm hover:bg-gray-900 transition-colors duration-200 ease-in-out"
+              >
+                {user}
+              </li>
+            ))}
           </ul>
         </div>
 
