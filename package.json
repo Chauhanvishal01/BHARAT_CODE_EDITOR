@@ -5,7 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon backend/server.js"
+    "dev": "nodemon backend/server.js",
+    "build": "npm install && cd frontend && npm install && npm run build"
   },
   "keywords": [],
   "author": "Vishal Chauhan",
