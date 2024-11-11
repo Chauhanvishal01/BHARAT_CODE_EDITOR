@@ -8,6 +8,7 @@ const App = () => {
   const [userName, setUserName] = useState("");
   const [language, setLanguage] = useState("javascript");
   const [code, setCode] = useState("");
+  const [copySuccess, setCopySuccess] = useState("");
   const joinRoom = () => {
     if (roomId && userName) {
       socket.emit("join", roomId, userName);
@@ -15,7 +16,13 @@ const App = () => {
     }
   };
 
-  const copyRoomId = () => {};
+  const copyRoomId = () => {
+    navigator.clipboard.writeText(roomId);
+    setCopySuccess("Copy To Clipboard!");
+    setTimeout(() => {
+      setCopySuccess("");
+    }, 2000);
+  };
   const handleCodeChange = (newCode) => {
     setCode(newCode);
   };
@@ -59,7 +66,7 @@ const App = () => {
   }
   return (
     <div className="flex min-h-screen bg-gradient-to-r from-violet-700 via-indigo-800 to-yellow-500">
-      <div className="w-1/4 bg-white p-6 shadow-xl rounded-r-lg flex flex-col space-y-6">
+      <div className="w-[300px] bg-white p-6 shadow-xl  flex flex-col space-y-6">
         {/* Room Info Section */}
         <div className="flex flex-col space-y-2">
           <h2 className="text-xl font-semibold text-gray-900">
@@ -71,6 +78,9 @@ const App = () => {
           >
             Copy Id
           </button>
+          {copySuccess && (
+            <span className="ml-2 text-green-500 text-xl">{copySuccess}</span>
+          )}
         </div>
 
         {/* Users List Section */}
@@ -89,7 +99,11 @@ const App = () => {
 
         {/* Language Selector */}
         <div>
-          <select className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+          <select
+            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+            value={language}
+            onChange={(e) => setLanguage(e.target.value)}
+          >
             <option value="javascript">JavaScript</option>
             <option value="python">Python</option>
             <option value="java">Java</option>
@@ -104,8 +118,8 @@ const App = () => {
       </div>
 
       {/* Editor Section */}
-      <div className="flex-1 p-6">
-        <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden h-full">
+      <div className="flex-1 ">
+        <div className="bg-gray-800   overflow-hidden h-full">
           <Editor
             height="100%"
             defaultLanguage={language}
