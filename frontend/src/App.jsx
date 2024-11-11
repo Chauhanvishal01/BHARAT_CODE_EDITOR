@@ -32,6 +32,12 @@ const App = () => {
     socket.emit("typing", { roomId, userName });
   };
 
+  const handleLanguageChange = (e) => {
+    const newLanguage = e.target.value;
+    setLanguage(newLanguage);
+    socket.emit("languageChange", { roomId, language: newLanguage });
+  };
+
   useEffect(() => {
     socket.on("userJoined", (users) => {
       setUsers(users);
@@ -46,11 +52,15 @@ const App = () => {
         setTyping("");
       }, 4000);
     });
+    socket.on("languageUpdate", (newLanguage) => {
+      setLanguage(newLanguage);
+    });
 
     return () => {
       socket.off("userJoined");
       socket.off("codeUpdate");
       socket.off("userTyping");
+      socket.off("languageUpdate");
     };
   }, []);
   useEffect(() => {
@@ -145,7 +155,7 @@ const App = () => {
           <select
             className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
             value={language}
-            onChange={(e) => setLanguage(e.target.value)}
+            onChange={handleLanguageChange}
           >
             <option value="javascript">JavaScript</option>
             <option value="python">Python</option>
